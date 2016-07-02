@@ -22,7 +22,7 @@ var IngredientsStore = Reflux.createStore({
         };
         this.ingredients.push(ingredient);
         this.fireUpdate();
-        HttpService.post('/ingredients')
+        HttpService.post('/ingredients', ingredient)
             .then(function(response){
                 this.getIngredients();
             }.bind(this));

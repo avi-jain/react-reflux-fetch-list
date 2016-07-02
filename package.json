@@ -1,0 +1,24 @@
+{
+  "name": "react-http-fetch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "watchify src/main.jsx -v -t [ babelify --presets [react] ] -o public/js/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Avi Jain",
+  "license": "MIT",
+  "description": "Using Github's fetch to make http requests",
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-preset-react": "^6.5.0",
+    "babelify": "^7.3.0",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "reflux": "^0.4.1",
+    "watchify": "^3.7.0",
+    "whatwg-fetch": "^1.0.0"
+  }
+}

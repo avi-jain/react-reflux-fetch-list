@@ -8,7 +8,7 @@ var List = React.createClass({
     mixins : [Reflux.listenTo(IngredientsStore, 'onChangeIngStore')],
     
     getInitialState : function(){
-        return {ingredients : []};
+        return {input: "",ingredients : []};
     },
     componentWillMount : function(){
         Actions.getIngredients();
@@ -16,12 +16,25 @@ var List = React.createClass({
     onChangeIngStore : function(event,ingredients){   // pass the same params as to trigger function
         this.setState({ingredients : ingredients});
     },
+    onInputChange : function(e){
+        this.setState({input: e.target.value}); 
+    },
+    onClick : function(e){
+        if(this.state.input){
+            Actions.postIngredient(this.state.input);
+        }
+        this.setState({input:""})
+    },
     render: function(){
         var listItems = this.state.ingredients.map(function(item){
             return <ListItem key = {item.id} ingredient = {item.text} />;
         });
         return(
-            <ul>{listItems}</ul>
+            <div>
+                <input type="text" placeholder="Enter Item" value={this.state.input} onChange={this.onInputChange} />
+                <button onClick={this.onClick} >Add Item</button>
+                <ul>{listItems}</ul>
+            </div>
         );
     }
 });

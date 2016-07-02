@@ -21486,7 +21486,7 @@ var List = React.createClass({
     mixins: [Reflux.listenTo(IngredientsStore, 'onChangeIngStore')],
 
     getInitialState: function () {
-        return { ingredients: [] };
+        return { input: "", ingredients: [] };
     },
     componentWillMount: function () {
         Actions.getIngredients();
@@ -21495,14 +21495,33 @@ var List = React.createClass({
         // pass the same params as to trigger function
         this.setState({ ingredients: ingredients });
     },
+    onInputChange: function (e) {
+        this.setState({ input: e.target.value });
+    },
+    onClick: function (e) {
+        if (this.state.input) {
+            Actions.postIngredient(this.state.input);
+        }
+        this.setState({ input: "" });
+    },
     render: function () {
         var listItems = this.state.ingredients.map(function (item) {
             return React.createElement(ListItem, { key: item.id, ingredient: item.text });
         });
         return React.createElement(
-            "ul",
+            "div",
             null,
-            listItems
+            React.createElement("input", { type: "text", placeholder: "Enter Item", value: this.state.input, onChange: this.onInputChange }),
+            React.createElement(
+                "button",
+                { onClick: this.onClick },
+                "Add Item"
+            ),
+            React.createElement(
+                "ul",
+                null,
+                listItems
+            )
         );
     }
 });
@@ -21560,7 +21579,20 @@ var IngredientsStore = Reflux.createStore({
             this.fireUpdate();
         }.bind(this)); //IMPORTANT
     },
-    postIngredient: function (text) {},
+    postIngredient: function (text) {
+        if (!this.ingredients) {
+            this.ingredients = []; // to prevent errors
+        }
+        var ingredient = {
+            "text": text,
+            "id": Math.floor(Date.now() / 1000) + text
+        };
+        this.ingredients.push(ingredient);
+        this.fireUpdate();
+        HttpService.post('/ingredients').then(function (response) {
+            this.getIngredients();
+        }.bind(this));
+    },
     fireUpdate: function () {
         this.trigger('change', this.ingredients); //trigger is a inbuilt reflux function for the store. change - event
     } // instead of repeating this line everywhere, make a separate trigger update function
@@ -21579,8 +21611,20 @@ var service = {
             //this is the JS promise
             return response.json(); // Will exclude stuff like headers
         });
+    },
+    post: function (url, ingredient) {
+        return fetch(baseURL + url, {
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "application/JSON"
+            },
+            method: "post",
+            body: JSON.stringify(ingredient)
+        }) //the second param is the options object.
+        .then(function (response) {
+            return response;
+        });
     }
-
 };
 
 module.exports = service;

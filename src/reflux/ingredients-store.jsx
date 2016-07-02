@@ -13,6 +13,19 @@ var IngredientsStore = Reflux.createStore({
         }.bind(this)); //IMPORTANT
     },
     postIngredient : function(text){
+        if(!this.ingredients){
+            this.ingredients = [];          // to prevent errors
+        }
+        var ingredient = {
+            "text" : text,
+            "id" :   Math.floor(Date.now()/1000) + text
+        };
+        this.ingredients.push(ingredient);
+        this.fireUpdate();
+        HttpService.post('/ingredients')
+            .then(function(response){
+                this.getIngredients();
+            }.bind(this));
         
     },
     fireUpdate  : function(){
